@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>幻方游戏工作室 - 防伪报价系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", system-ui, sans-serif;
+        }
+        body {
+            background-color: #f4f7fa;
+            padding: 16px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .brand-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .brand-logo {
+            display: inline-block;
+            font-size: 18px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 0;
+            font-size: 22px;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 16px;
+        }
+        .header-info{
+            display: grid;
+            grid-template-columns: repeat(5,1fr);
+            gap:14px;
+            margin-bottom:18px;
+        }
+        .header-info > div label{
+            display:block;
+            margin-bottom:4px;
+            font-size:14px;
+            color:#444;
+        }
+        input, select{
+            padding:11px 12px;
+            border:1px solid #dcdfe6;
+            border-radius:6px;
+            font-size:15px;
+            width:100%;
+        }
+        .table-wrap{
+            overflow-x:auto;
+        }
+        table{
+            width:100%;
+            min-width:640px;
+            border-collapse: collapse;
+            margin:14px 0;
+        }
+        th,td{
+            border:1px solid #e5e7eb;
+            padding:12px 8px;
+            text-align:center;
+            font-size:14px;
+        }
+        th{
+            background:#f0f2f5;
+        }
+        .btn-group{
+            display:flex;
+            gap:10px;
+            margin:14px 0;
+            flex-wrap:wrap;
+        }
+        button{
+            padding:11px 16px;
+            border:none;
+            border-radius:6px;
+            cursor:pointer;
+            font-size:15px;
+            flex:1;
+            min-width:110px;
+        }
+        .btn-add{background:#409eff;color:white;}
+        .btn-del{background:#f56c6c;color:white;}
+        .btn-copy{background:#67c23a;color:white;}
+        .btn-secure{background:#9b59b6;color:#fff;}
+        .btn-reset{background:#909399;color:white;}
+        .total-box{
+            font-size:17px;
+            font-weight:bold;
+            text-align:right;
+            padding:14px 16px;
+            background:#ecf5ff;
+            border-radius:8px;
+            line-height:1.8;
+        }
+        .quote-preview-wrap h3{
+            margin-bottom:12px;
+            color:#303133;
+            font-size:16px;
+        }
+        .quote-preview{
+            white-space:pre-wrap;
+            font-family:Consolas,Monaco,"Microsoft Yahei",monospace;
+            line-height:1.7;
+            font-size:14px;
+            background:#ffffff;
+            padding:18px;
+            border-radius:10px;
+            min-height:220px;
+            border:1px solid #dcdfe6;
+            box-shadow:0 1px 8px rgba(102,126,234,0.08);
+            color:#2c3e50;
+            overflow-x:auto;
+        }
+        .anti-card{
+            background:#fef8e8;
+            border:1px solid #f3d89c;
+            padding:14px;
+            border-radius:8px;
+            margin-top:12px;
+        }
+        .hash-text{
+            font-family:monospace;
+            font-size:12px;
+            word-break:break-all;
+            color:#c0392b;
+            margin:6px 0;
+        }
+        #checkFingerInput{max-width:100%;}
+        .tip-text{
+            font-size:12px;
+            color:#666;
+            margin:4px 0 6px 0;
+        }
+        .brand-small{
+            margin-top:6px;
+            color:#9b59b6;
+            font-weight:600;
+        }
+
+        /*平板*/
+        @media(max-width:1100px){
+            .header-info{grid-template-columns: repeat(3,1fr);}
+        }
+        /*手机*/
+        @media(max-width:640px){
+            body{padding:12px;}
+            .card{padding:16px;}
+            .header-info{grid-template-columns: 1fr;}
+            h1{font-size:20px;}
+            .total-box{font-size:15px;}
+            .quote-preview{font-size:12px;padding:14px;}
+            button{min-width:100px;font-size:14px;padding:10px 12px;}
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="brand-header">
+        <div class="brand-logo">🎮 幻方游戏工作室</div>
+        <h1>📋 防伪报价系统</h1>
+    </div>
+    <div class="card">
+        <div class="header-info">
+            <div>
+                <label>客户名称：</label>
+                <input type="text" id="customerName" placeholder="请输入客户名称">
+            </div>
+            <div>
+                <label>报价日期：</label>
+                <input type="date" id="quoteDate">
+            </div>
+            <div>
+                <label>报价人：</label>
+                <input list="quoteUserList" id="quoteUser" placeholder="选择或手动输入">
+                <datalist id="quoteUserList">
+                    <option value="GameBoy"></option>
+                    <option value="梦回"></option>
+                </datalist>
+            </div>
+            <div>
+                <label>优惠比例(%)：</label>
+                <input type="text" id="discountPercent" placeholder="100=不打折，可直接输入95">
+            </div>
+            <div>
+                <label>报价编号(业务流水)：</label>
+                <input type="text" readonly id="quoteSn">
+                <div class="tip-text">仅用于归档查找，不可用于校验</div>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>选择商品</th>
+                        <th>商品名称（可手动修改）</th>
+                        <th>单价(元)</th>
+                        <th>数量</th>
+                        <th>小计(元)</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+        <div class="btn-group">
+            <button class="btn-add" onclick="addRow()">➕ 添加产品项</button>
+            <button class="btn-copy" onclick="copyQuote()">📋复制报价单(微信适配)</button>
+            <button class="btn-secure" onclick="reGenAntiFake()">🔐重新生成防伪信息</button>
+            <button class="btn-reset" onclick="resetAll()">🔄重置</button>
+        </div>
+        <div class="total-box">
+            原始合计：<span id="originTotal">0.00</span> 元<br/>
+            优惠比例：<span id="showDiscount">100</span> %<br/>
+            ✅优惠后实付金额：<span id="finalMoney">0.00</span> 元
+        </div>
+        <div class="anti-card">
+            <div>
+                <div>业务流水编号：<span id="showSn"></span></div>
+                <div class="brand-small">🎮 幻方游戏工作室</div>
+                <div>防篡改校验指纹(MD5‑32位)：</div>
+                <div class="hash-text" id="md5Finger"></div>
+                <div class="tip-text">⚠️校验框只能粘贴上面这串指纹，不要粘贴业务流水编号！</div>
+                <div style="margin-top:8px;">
+                    <input id="checkFingerInput" placeholder="粘贴【32位校验指纹】进行防篡改校验">
+                    <button class="btn-secure" onclick="checkAntiFake()">校验</button>
+                    <div id="checkResult" style="margin-top:6px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card quote-preview-wrap">
+        <h3>📄网页预览（仅供网页查看）</h3>
+        <div class="quote-preview" id="previewBox"></div>
+    </div>
+</div>
+
+<script>
+const goodsList = [
+    {name:"请选择商品",price:""},
+    {name:"64像素皮肤定制",price:"20"},
+    {name:"128像素皮肤定制",price:"30"},
+    {name:"渲染图制作",price:"2"},
+    {name:"渲染图（定制赠送）",price:"0"}
+];
+
+function md5(string) {
+    function rotateLeft(x,n) {return (x<<n)|(x>>>(32-n));}
+    function addUnsigned(x,y){
+        let l=(x&0xFFFF)+(y&0xFFFF);
+        let m=(x>>16)+(y>>16)+(l>>16);
+        return (m<<16)|(l&0xFFFF);
+    }
+    function F(x,y,z){return (x&y)|((~x)&z);}
+    function G(x,y,z){return (x&z)|(y&(~z));}
+    function H(x,y,z){return x^y^z;}
+    function I(x,y,z){return y^(x|(~z));}
+    function FF(a,b,c,d,x,s,ac){
+        a=addUnsigned(a,addUnsigned(addUnsigned(F(b,c,d),x),ac));
+        a=rotateLeft(a,s);
+        return addUnsigned(a,b);
+    }
+    function GG(a,b,c,d,x,s,ac){
+        a=addUnsigned(a,addUnsigned(addUnsigned(G(b,c,d),x),ac));
+        a=rotateLeft(a,s);
+        return addUnsigned(a,b);
+    }
+    function HH(a,b,c,d,x,s,ac){
+        a=addUnsigned(a,addUnsigned(addUnsigned(H(b,c,d),x),ac));
+        a=rotateLeft(a,s);
+        return addUnsigned(a,b);
+    }
+    function II(a,b,c,d,x,s,ac){
+        a=addUnsigned(a,addUnsigned(addUnsigned(I(b,c,d),x),ac));
+        a=rotateLeft(a,s);
+        return addUnsigned(a,b);
+    }
+    function convertToWordArray(str){
+        let wCount=(((str.length+8)-((str.length+8)%64))/64+1)*16;
+        let wordArray=new Array(wCount-1);
+        let bytePosition=0;
+        let byteCount=0;
+        while(byteCount<str.length){
+            wordArray[bytePosition>>2]|=str.charCodeAt(byteCount)<<((byteCount%4)*8);
+            bytePosition++;byteCount++;
+        }
+        let temp=bytePosition>>2;
+        wordArray[temp]|=0x80<<((bytePosition%4)*8);
+        wordArray[wCount-2]=str.length<<3;
+        wordArray[wCount-1]=str.length>>>29;
+        return wordArray;
+    }
+    function wordToHex(value){
+        let hex="",h;
+        for(let i=0;i<=3;i++){
+            h=(value>>(i*8+4))&0x0F; hex+=h.toString(16);
+            h=(value>>(i*8))&0x0F; hex+=h.toString(16);
+        }
+        return hex;
+    }
+    let x=convertToWordArray(string);
+    let a=0x67452301,b=0xEFCDAB89,c=0x98BADCFE,d=0x10325476;
+    let S11=7,S12=12,S13=17,S14=22;
+    let S21=5,S22=9,S23=14,S24=20;
+    let S31=4,S32=11,S33=16,S34=23;
+    let S41=6,S42=10,S43=15,S44=21;
+    for(let k=0;k<x.length;k+=16){
+        let AA=a,BB=b,CC=c,DD=d;
+        a=FF(a,b,c,d,x[k+0], S11,0xD76AA478);
+        d=FF(d,a,b,c,x[k+1], S12,0xE8C7B756);
+        c=FF(c,d,a,b,x[k+2], S13,0x242070DB);
+        b=FF(b,c,d,a,x[k+3], S14,0xC1BDCEEE);
+        a=FF(a,b,c,d,x[k+4], S11,0xF57C0FAF);
+        d=FF(d,a,b,c,x[k+5], S12,0x4787C62A);
+        c=FF(c,d,a,b,x[k+6], S13,0xA8304613);
+        b=FF(b,c,d,a,x[k+7], S14,0xFD469501);
+        a=FF(a,b,c,d,x[k+8], S11,0x698098D8);
+        d=FF(d,a,b,c,x[k+9], S12,0x8B44F7AF);
+        c=FF(c,d,a,b,x[k+10],S13,0xFFFF5BB1);
+        b=FF(b,c,d,a,x[k+11],S14,0x895CD7BE);
+        a=FF(a,b,c,d,x[k+12],S11,0x6B901122);
+        d=FF(d,a,b,c,x[k+13],S12,0xFD987193);
+        c=FF(c,d,a,b,x[k+14],S13,0xA679438E);
+        b=FF(b,c,d,a,x[k+15],S14,0x49B40821);
+        a=GG(a,b,c,d,x[k+1], S21,0xF61E2562);
+        d=GG(d,a,b,c,x[k+6], S22,0xC040B340);
+        c=GG(c,d,a,b,x[k+11],S23,0x265E5A51);
+        b=GG(b,c,d,a,x[k+0], S24,0xE9B6C7AA);
+        a=GG(a,b,c,d,x[k+5], S21,0xD62F105D);
+        d=GG(d,a,b,c,x[k+10],S22,0x02441453);
+        c=GG(c,d,a,b,x[k+15],S23,0xD8A1E681);
+        b=GG(b,c,d,a,x[k+4], S24,0xE7D3FBC8);
+        a=GG(a,b,c,d,x[k+9], S21,0x21E1CDE6);
+        d=GG(d,a,b,c,x[k+14],S22,0xC33707D6);
+        c=GG(c,d,a,b,x[k+3], S23,0xF4D50D87);
+        b=GG(b,c,d,a,x[k+8], S24,0x455A14ED);
+        a=GG(a,b,c,d,x[k+13],S21,0xA9E3E905);
+        d=GG(d,a,b,c,x[k+2], S22,0xFCEFA3F8);
+        c=GG(c,d,a,b,x[k+7], S23,0x676F02D9);
+        b=GG(b,c,d,a,x[k+12],S24,0x8D2A4C8A);
+        a=HH(a,b,c,d,x[k+5], S31,0xFFFA3942);
+        d=HH(d,a,b,c,x[k+8], S32,0x8771F681);
+        c=HH(c,d,a,b,x[k+11],S33,0x6D9D6122);
+        b=HH(b,c,d,a,x[k+14],S34,0xFDE5380C);
+        a=HH(a,b,c,d,x[k+1], S31,0xA4BEEA44);
+        d=HH(d,a,b,c,x[k+4], S32,0x4BDECFA9);
+        c=HH(c,d,a,b,x[k+7], S33,0xF6BB4B60);
+        b=HH(b,c,d,a,x[k+10],S34,0xBEBFBC70);
+        a=HH(a,b,c,d,x[k+13],S31,0x289B7EC6);
+        d=HH(d,a,b,c,x[k+0], S32,0xEAA127FA);
+        c=HH(c,d,a,b,x[k+3], S33,0xD4EF3085);
+        b=HH(b,c,d,a,x[k+6], S34,0x04881D05);
+        a=HH(a,b,c,d,x[k+9], S31,0xD9D4D039);
+        d=HH(d,a,b,c,x[k+12],S32,0xE6DB99E5);
+        c=HH(c,d,a,b,x[k+15],S33,0x1FA27CF8);
+        b=HH(b,c,d,a,x[k+2], S34,0xC4AC5665);
+        a=II(a,b,c,d,x[k+0], S41,0xF4292244);
+        d=II(d,a,b,c,x[k+7], S42,0x432AFF97);
+        c=II(c,d,a,b,x[k+14],S43,0xAB9423A7);
+        b=II(b,c,d,a,x[k+5], S44,0xFC93A039);
+        a=II(a,b,c,d,x[k+12],S41,0x655B59C3);
+        d=II(d,a,b,c,x[k+3], S42,0x8F0CCC92);
+        c=II(c,d,a,b,x[k+10],S43,0xFFEFF47D);
+        b=II(b,c,d,a,x[k+1], S44,0x85845DD1);
+        a=II(a,b,c,d,x[k+8], S41,0x6FA87E4F);
+        d=II(d,a,b,c,x[k+15],S42,0xFE2CE6E0);
+        c=II(c,d,a,b,x[k+6], S43,0xA3014314);
+        b=II(b,c,d,a,x[k+13],S44,0x4E0811A1);
+        a=II(a,b,c,d,x[k+4], S41,0xF7537E82);
+        d=II(d,a,b,c,x[k+11],S42,0xBD3AF235);
+        c=II(c,d,a,b,x[k+2], S43,0x2AD7D2BB);
+        b=II(b,c,d,a,x[k+9], S44,0xEB86D391);
+        a=addUnsigned(a,AA);b=addUnsigned(b,BB);
+        c=addUnsigned(c,CC);d=addUnsigned(d,DD);
+    }
+    return (wordToHex(a)+wordToHex(b)+wordToHex(c)+wordToHex(d)).toLowerCase();
+}
+
+let antiSn = "";
+let antiFinger = "";
+
+function buildRawData(){
+    let customer = document.getElementById("customerName").value;
+    let qdate = document.getElementById("quoteDate").value;
+    let quoteUser = document.getElementById("quoteUser").value;
+    let discountPercent = document.getElementById("discountPercent").value;
+    let originTotal = document.getElementById("originTotal").innerText;
+    let finalMoney = document.getElementById("finalMoney").innerText;
+    let rows = document.querySelectorAll("#tableBody tr");
+    let raw = antiSn + "|" + customer + "|" + qdate + "|" + quoteUser + "|" + discountPercent + "|" + originTotal + "|" + finalMoney + "|";
+    rows.forEach(tr=>{
+        raw += tr.querySelector(".p-name").value + ";"
+            + tr.querySelector(".p-price").value + ";"
+            + tr.querySelector(".p-num").value + "|";
+    })
+    return raw;
+}
+
+// 生成【网页预览版】（保留长分割线）
+function getWebPreviewText(){
+    let customer = document.getElementById("customerName").value || "未填写";
+    let qdate = document.getElementById("quoteDate").value;
+    let quoteUser = document.getElementById("quoteUser").value || "未填写";
+    let sn = document.getElementById("quoteSn").value;
+    let originTotal = document.getElementById("originTotal").innerText;
+    let discount = document.getElementById("showDiscount").innerText;
+    let finalMoney = document.getElementById("finalMoney").innerText;
+    let rows = document.querySelectorAll("#tableBody tr");
+
+    let text = `========================================
+                幻方游戏工作室 报价单
+========================================
+客户：${customer}
+报价日期：${qdate}
+报价人：${quoteUser}
+业务流水编号：${sn}
+
+——————————产品明细——————————
+`;
+    rows.forEach(tr=>{
+        let name = tr.querySelector(".p-name").value||"未命名产品";
+        let p = tr.querySelector(".p-price").value;
+        let n = tr.querySelector(".p-num").value;
+        let sub = tr.querySelector(".p-sub").innerText;
+        text += `• ${name}
+    单价：${p}元  × 数量：${n}  = 小计：${sub}元
+`;
+    })
+
+    text += `——————————————————————————
+原始合计：${originTotal} 元
+优惠折扣：${discount} %
+✅优惠后实付总金额：${finalMoney} 元
+
+【报价说明】
+1.本报价由幻方游戏工作室出具，报价信息以校验指纹为准。
+2.修改报价内任意内容（含折扣），校验指纹将会失效。
+3.交易以前期沟通确认内容为准。
+
+报价单位：幻方游戏工作室
+报价人：${quoteUser}
+校验指纹：${antiFinger}
+========================================`;
+    return text;
+}
+
+// 生成【微信社交软件适配版】，全部用短分割，不会气泡折行
+function getChatCopyText(){
+    let customer = document.getElementById("customerName").value || "未填写";
+    let qdate = document.getElementById("quoteDate").value;
+    let quoteUser = document.getElementById("quoteUser").value || "未填写";
+    let sn = document.getElementById("quoteSn").value;
+    let originTotal = document.getElementById("originTotal").innerText;
+    let discount = document.getElementById("showDiscount").innerText;
+    let finalMoney = document.getElementById("finalMoney").innerText;
+    let rows = document.querySelectorAll("#tableBody tr");
+
+    let text = `【幻方游戏工作室 报价单】
+——————
+客户：${customer}
+报价日期：${qdate}
+报价人：${quoteUser}
+业务流水编号：${sn}
+
+产品明细：
+`;
+    rows.forEach(tr=>{
+        let name = tr.querySelector(".p-name").value||"未命名产品";
+        let p = tr.querySelector(".p-price").value;
+        let n = tr.querySelector(".p-num").value;
+        let sub = tr.querySelector(".p-sub").innerText;
+        text += `• ${name}｜单价${p}元 ×${n}件 = ${sub}元\n`;
+    })
+
+    text += `
+——————
+原始合计：${originTotal} 元
+优惠折扣：${discount} %
+✅实付总金额：${finalMoney} 元
+
+【报价说明】
+1.本报价由幻方游戏工作室出具，以校验指纹为准。
+2.修改任意内容，校验指纹即失效。
+3.交易以双方沟通确认内容为准。
+
+报价单位：幻方游戏工作室
+报价人：${quoteUser}
+校验指纹：${antiFinger}`;
+    return text;
+}
+
+function updateAntiAndPreview(){
+    antiFinger = md5(buildRawData());
+    document.getElementById("md5Finger").innerText = antiFinger;
+    document.getElementById("previewBox").innerText = getWebPreviewText();
+}
+
+window.onload = function(){
+    let now = new Date();
+    let d = now.toISOString().split('T')[0];
+    document.getElementById("quoteDate").value = d;
+    document.getElementById("discountPercent").value = "100";
+    addRow();
+    reGenAntiFake();
+    document.getElementById("quoteUser").addEventListener("input",updateAntiAndPreview);
+    document.getElementById("discountPercent").addEventListener("input",()=>{
+        calcAll();
+        updateAntiAndPreview();
+    });
+}
+
+function addRow(){
+    let tb = document.getElementById("tableBody");
+    let tr = document.createElement("tr");
+    let optHtml = "";
+    goodsList.forEach((g,idx)=>{
+        optHtml += `<option value="${idx}">${g.name}</option>`;
+    });
+    tr.innerHTML = `
+        <td>
+            <select class="p-select">
+                ${optHtml}
+            </select>
+        </td>
+        <td><input type="text" class="p-name" placeholder="产品名称"></td>
+        <td><input type="number" class="p-price" value="0" step="0.01"></td>
+        <td><input type="number" class="p-num" value="1" step="1"></td>
+        <td class="p-sub">0.00</td>
+        <td><button class="btn-del" onclick="delRow(this)">删除</button></td>
+    `;
+    tb.appendChild(tr);
+    const sel = tr.querySelector(".p-select");
+    const nameInp = tr.querySelector(".p-name");
+    const priceInp = tr.querySelector(".p-price");
+    sel.onchange = function(){
+        const idx = Number(this.value);
+        const g = goodsList[idx];
+        if(g.name !== "请选择商品"){
+            nameInp.value = g.name;
+            priceInp.value = g.price;
+        }
+        calcAll();
+        updateAntiAndPreview();
+    };
+    tr.querySelectorAll("input").forEach(inp=>{
+        inp.oninput = function(){
+            calcAll();
+            updateAntiAndPreview();
+        };
+    })
+    calcAll();
+    updateAntiAndPreview();
+}
+
+function delRow(btn){
+    let tr = btn.closest("tr");
+    tr.remove();
+    calcAll();
+    updateAntiAndPreview();
+}
+
+function calcAll(){
+    let rows = document.querySelectorAll("#tableBody tr");
+    let originTotal = 0;
+    rows.forEach(tr=>{
+        let price = parseFloat(tr.querySelector(".p-price").value)||0;
+        let num = parseFloat(tr.querySelector(".p-num").value)||0;
+        let sub = price * num;
+        tr.querySelector(".p-sub").innerText = sub.toFixed(2);
+        originTotal += sub;
+    });
+    let discount = parseFloat(document.getElementById("discountPercent").value);
+    if(isNaN(discount)) discount = 100;
+    if(discount<0) discount=0;
+    if(discount>100) discount=100;
+    let final = originTotal * discount / 100;
+    document.getElementById("originTotal").innerText = originTotal.toFixed(2);
+    document.getElementById("showDiscount").innerText = discount;
+    document.getElementById("finalMoney").innerText = final.toFixed(2);
+}
+
+//复制按钮直接复制聊天适配版本
+function copyQuote(){
+    let t = getChatCopyText();
+    navigator.clipboard.writeText(t).then(()=>{
+        alert("✅报价单已复制（微信QQ适配版），直接粘贴发给客户！");
+    })
+}
+
+function reGenAntiFake(){
+    let rand = Math.random().toString(36).slice(2)+Date.now().toString(36);
+    antiSn = rand;
+    document.getElementById("quoteSn").value = antiSn;
+    document.getElementById("showSn").innerText = antiSn;
+    updateAntiAndPreview();
+}
+
+function checkAntiFake(){
+    let inputHash = document.getElementById("checkFingerInput").value.trim();
+    let resDom = document.getElementById("checkResult");
+    if(inputHash.length !==32){
+        resDom.innerHTML = "<span style='color:#f59e0b'>⚠️长度不对！请粘贴【32位校验指纹】，不要粘贴业务流水编号</span>";
+        return;
+    }
+    if(inputHash === antiFinger){
+        resDom.innerHTML = "<span style='color:green'>✅校验通过，报价未被篡改</span>";
+    }else{
+        resDom.innerHTML = "<span style='color:red'>❌校验失败，内容已篡改或指纹错误</span>";
+    }
+}
+
+function resetAll(){
+    document.getElementById("customerName").value = "";
+    document.getElementById("quoteUser").value = "";
+    document.getElementById("discountPercent").value = "100";
+    let now = new Date();
+    document.getElementById("quoteDate").value = now.toISOString().split('T')[0];
+    document.getElementById("tableBody").innerHTML = "";
+    addRow();
+    reGenAntiFake();
+    document.getElementById("checkFingerInput").value="";
+    document.getElementById("checkResult").innerText="";
+}
+</script>
+</body>
+</html>

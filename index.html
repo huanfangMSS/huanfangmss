@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>幻方游戏工作室 - 官方总首页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", system-ui, sans-serif;
+        }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0c0e14, #252a35);
+            color: #e6e8ef;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .header-title {
+            margin-bottom: 60px;
+        }
+        .header-title h1 {
+            font-size: 42px;
+            color: #7c5cff;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
+        }
+        .header-title p {
+            color: #8a91a0;
+            font-size: 16px;
+        }
+        /* 导航卡片容器 */
+        .nav-card-wrap {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 80px;
+        }
+        .nav-card {
+            background: linear-gradient(145deg, #161b26, #0f131a);
+            border: 1px solid #7c5cff33;
+            border-radius: 14px;
+            padding: 36px 24px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .nav-card:hover {
+            transform: translateY(-8px);
+            border-color: #7c5cff;
+            box-shadow: 0 8px 30px #7c5cff26;
+        }
+        .nav-card h2 {
+            color: #fff;
+            font-size: 24px;
+            margin-bottom: 14px;
+        }
+        .nav-card .desc {
+            color: #a2a9bb;
+            font-size: 15px;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        .jump-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #7c5cff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        .jump-btn:hover {
+            background: #9b7fff;
+        }
+        footer {
+            margin-top: 100px;
+            padding-top: 30px;
+            border-top: 1px solid #252a35;
+            color: #5c6372;
+            font-size: 14px;
+        }
+        /* 移动端适配 */
+        @media (max-width: 640px) {
+            .header-title h1 {
+                font-size: 28px;
+            }
+            .nav-card-wrap {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-title">
+            <h1>幻方游戏工作室</h1>
+            <p>MC皮肤定制 | 线上活动 | 防伪报价 统一入口总站</p>
+        </div>
+
+        <div class="nav-card-wrap">
+            <!-- 卡片1：线上活动官网 -->
+            <div class="nav-card">
+                <h2>幻方线上活动官网</h2>
+                <div class="desc">
+                    查看工作室最新限时活动、活动福利、往期活动记录，包含低价皮肤、网页免单彩蛋等全部活动内容。
+                    <br>活动时间、活动规则全部在此页面展示。
+                </div>
+                <a href="活动官网文件夹/index1.html" class="jump-btn">进入活动站点</a>
+            </div>
+
+            <!-- 卡片2：皮肤定制定价页 -->
+            <div class="nav-card">
+                <h2>皮肤定制定价一览</h2>
+                <div class="desc">
+                    64/128像素MC皮肤定价、组合优惠、完整定制协议、版权免责规则、客服联系方式，支持弹窗一键咨询。
+                </div>
+                <a href="皮肤定价文件夹/index2.html" class="jump-btn">查看皮肤价格</a>
+            </div>
+
+            <!-- 卡片3：防伪报价系统 -->
+            <div class="nav-card">
+                <h2>防伪报价系统</h2>
+                <div class="desc">
+                    自动生成带MD5校验指纹的正式报价单，支持折扣计算、产品明细增删、防篡改校验，适配微信/QQ一键复制报价。
+                </div>
+                <a href="报价系统文件夹/index3.html" class="jump-btn">打开报价工具</a>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2026 幻方游戏工作室 总站 | 所有业务页面独立互不干扰，原页面内容无任何修改</p>
+        </footer>
+    </div>
+</body>
+</html>
