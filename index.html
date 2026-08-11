@@ -454,13 +454,13 @@
     confirmBtn.addEventListener('click', checkPassword);
     pwdInput.addEventListener('keydown',e=>{if(e.key==='Enter')checkPassword()})
 
-    // ====================== 小游戏逻辑（修复按钮失效BUG） ======================
+    // ====================== 小游戏逻辑（修复慢仙人掌+落地撞墙问题） ======================
     const gameBox = document.getElementById('gameBox');
     const dino = document.getElementById('dino');
     const scoreNum = document.getElementById('scoreNum');
     const gameOverText = document.getElementById('gameOverText');
     const startBtn = document.getElementById('startBtn');
-    const pauseBtn = document.getElementById('exitBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
     const exitBtn = document.getElementById('exitBtn');
     const countText = document.getElementById('countText');
     const welcomeText = document.getElementById('welcomeText');
@@ -474,10 +474,12 @@
     let createCactusTimer = null;
     let gameLoopTimer = null;
     const baseSpawnInterval = 1200;
-    // 难度参数：无上限，25分极难达成
+    // 难度参数修复：1.最低速度限制 2.仙人掌最小安全间距 3.碰撞收缩
     const minSafeGap = 350;
+    const minCactusSpeed = 3.2; // 仙人掌最低移动速度，不会极慢
     const speedStep = 0.12;
     const spawnCutStep = 18;
+    const minCactusDistance = 220; // 同屏仙人掌最小横向距离，防止贴脸
     let welcomeHidden = false;
 
     function dinoJump() {
@@ -495,29 +497,49 @@
         return curr + Math.floor(Math.random() * 500);
     }
 
+    // 生成仙人掌前判断上一株距离，防止贴脸
+    function getLastCactusLeft() {
+        if(cactusList.length === 0) return 9999;
+        return parseFloat(cactusList[cactusList.length -1].style.left);
+    }
     function createCactus() {
         if (!gameRunning || isPaused || isCountdown) return;
+        const lastLeft = getLastCactusLeft();
+        const boxW = gameBox.offsetWidth;
+        // 距离过近不生成，延迟一轮
+        if(boxW - lastLeft < minCactusDistance){
+            clearInterval(createCactusTimer);
+            createCactusTimer = setInterval(createCactus, getRandomSpawnTime());
+            return;
+        }
         const cactus = document.createElement('div');
         cactus.className = 'cactus';
         gameBox.appendChild(cactus);
-        cactus.style.left = gameBox.offsetWidth + 'px';
+        cactus.style.left = boxW + 'px';
         cactusList.push(cactus);
         clearInterval(createCactusTimer);
         createCactusTimer = setInterval(createCactus, getRandomSpawnTime());
     }
 
+    // 宽松碰撞判定：恐龙、仙人掌各向内收缩，擦边不死
     function checkCollision() {
         const dRect = dino.getBoundingClientRect();
         const boxRect = gameBox.getBoundingClientRect();
+        // 恐龙碰撞盒向内收缩8px
         const d = {
-            left:dRect.left-boxRect.left,right:dRect.right-boxRect.left,
-            top:dRect.top-boxRect.top,bottom:dRect.bottom-boxRect.top
+            left:dRect.left - boxRect.left + 8,
+            right:dRect.right - boxRect.left - 8,
+            top:dRect.top - boxRect.top + 4,
+            bottom:dRect.bottom - boxRect.top - 2
         };
         for(let c of cactusList){
             const cRect = c.getBoundingClientRect();
+            // 仙人掌碰撞盒向内收缩4px
             const cBox = {
-                left:cRect.left-boxRect.left,right:cRect.right-boxRect.left,
-                top:cRect.top-boxRect.top,bottom:cRect.bottom-boxRect.top
+                left:cRect.left - boxRect.left + 4,
+                right:cRect.right - boxRect.left - 4,
+                top:cRect.top - boxRect.top + 2,
+                bottom:cRect.bottom - boxRect.top
             };
             if(!(d.right < cBox.left || d.left > cBox.right || d.bottom < cBox.top || d.top > cBox.bottom)){
                 gameOver();
@@ -537,7 +559,10 @@
                 cactusList.splice(idx,1);
                 score += 1;
                 scoreNum.innerText = score;
-                cactusSpeed += speedStep;
+                // 提速但不低于最低速度
+                if(cactusSpeed + speedStep >= minCactusSpeed){
+                    cactusSpeed += speedStep;
+                }
                 clearInterval(createCactusTimer);
                 createCactusTimer = setInterval(createCactus, getRandomSpawnTime());
             }
@@ -585,7 +610,6 @@
     function startGameLoop() {
         clearInterval(createCactusTimer);
         createCactusTimer = setInterval(createCactus, getRandomSpawnTime());
-        gameLoop();
     }
 
     function startCountdown() {
@@ -616,7 +640,6 @@
         },600)
     }
 
-    // 按钮绑定（全部修复，无变量错误）
     startBtn.addEventListener('click', ()=>{
         if(gameRunning && !isPaused) return;
         if(gameOverText.style.display === 'block'){restartGame();return;}
