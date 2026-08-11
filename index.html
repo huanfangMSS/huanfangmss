@@ -410,7 +410,6 @@
 
         <footer>
             <p>© 2026 幻方游戏工作室 总站 | HuanFang | MSS | 版权保护©</p>
-        </footer>
     </div>
 <script>
     // 密码配置
@@ -479,7 +478,11 @@
     let createCactusTimer = null;
     let gameLoopTimer = null;
     let baseSpawnInterval = 1200;
-    const minSafeGap = 700; // 最小安全生成间隔，保证能跳过去
+    // 难度参数：保证高分容错
+    const minSafeGap = 600;   // 最小安全间隔（不会挤死）
+    const maxSpeed = 8;       // 速度上限，不会无限加速
+    const speedStep = 0.3;    // 每10分提速幅度
+    const spawnCutStep = 80;  // 每10分缩短生成间隔
     let welcomeHidden = false; // 标记活动文字是否已播放消失动画
 
     // 恐龙跳跃
@@ -492,9 +495,19 @@
         }, 300);
     }
 
-    // 获取随机安全生成间隔（700~1400ms）
+    // 根据当前分数计算当前生成间隔（每10分缩小间隔，有下限）
+    function getCurrentSpawnInterval() {
+        const level = Math.floor(score / 10);
+        const reduce = level * spawnCutStep;
+        const val = baseSpawnInterval - reduce;
+        return Math.max(minSafeGap, val);
+    }
+
+    // 获取随机安全生成间隔（区间随分数收紧，但保底600ms）
     function getRandomSpawnTime() {
-        return minSafeGap + Math.floor(Math.random() * 700);
+        const currBase = getCurrentSpawnInterval();
+        const randomRange = 600;
+        return currBase + Math.floor(Math.random() * randomRange);
     }
 
     // 生成仙人掌
@@ -549,8 +562,13 @@
                 cactusList.splice(idx, 1);
                 score += 1;
                 scoreNum.innerText = score;
-                // 随分数提速
-                if (score % 10 === 0) cactusSpeed += 0.3;
+                // ========== 每跳过10个提升难度，速度有上限 ==========
+                if (score % 10 === 0 && cactusSpeed < maxSpeed) {
+                    cactusSpeed += speedStep;
+                    // 刷新仙人掌生成间隔
+                    clearInterval(createCactusTimer);
+                    createCactusTimer = setInterval(createCactus, getRandomSpawnTime());
+                }
             }
         });
         checkCollision();
@@ -591,7 +609,7 @@
         // 清空仙人掌
         cactusList.forEach(c => c.remove());
         cactusList = [];
-        // 重置分数
+        // 重置分数、速度、生成间隔
         score = 0;
         cactusSpeed = 4;
         scoreNum.innerText = score;
@@ -649,7 +667,7 @@
             return;
         }
         if(isPaused){
-            // 暂停状态恢复，走5秒倒计时（无需再播放开场动画）
+            // 暂停状态恢复，走5秒倒计时
             cancelAnimationFrame(gameLoopTimer);
             clearInterval(createCactusTimer);
             startCountdown();
