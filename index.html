@@ -35,12 +35,175 @@
             color: #8a91a0;
             font-size: 16px;
         }
+        /* ========== 动画关键帧 ========== */
+        /* 上下浮动呼吸 */
+        @keyframes floatAnim {
+            0% { transform: translateY(-50%) translateY(-4px); }
+            50% { transform: translateY(-50%) translateY(4px); }
+            100% { transform: translateY(-50%) translateY(-4px); }
+        }
+        @keyframes floatSimple {
+            0% { transform: translateY(-2px); }
+            50% { transform: translateY(2px); }
+            100% { transform: translateY(-2px); }
+        }
+        /* 流光渐变色彩 */
+        @keyframes colorFlow {
+            0% { color: #b3a0ff; }
+            50% { color: #7c5cff; }
+            100% { color: #b3a0ff; }
+        }
+        /* 红白呼吸闪烁（游戏结束文字） */
+        @keyframes redBlink {
+            0% { color: #ff9b9b; opacity:0.7; }
+            50% { color: #ff6666; opacity:1; }
+            100% { color: #ff9b9b; opacity:0.7; }
+        }
+        /* 倒计时放大脉冲 */
+        @keyframes countPulse {
+            0% { transform: scale(0.9); opacity:0.8; }
+            50% { transform: scale(1.15); opacity:1; }
+            100% { transform: scale(0.9); opacity:0.8; }
+        }
+        /* 分数微光跳动 */
+        @keyframes scoreShine {
+            0% { text-shadow: 0 0 4px #7c5cff60; }
+            50% { text-shadow: 0 0 12px #7c5cff; }
+            100% { text-shadow: 0 0 4px #7c5cff60; }
+        }
+        /* ========== 新增恐龙游戏样式 ========== */
+        .dino-game-box {
+            width: 100%;
+            max-width: 700px;
+            height: 160px;
+            margin: 0 auto 50px;
+            border: 1px solid #7c5cff40;
+            border-radius: 12px;
+            background: #0f131a;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .dino-ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 4px;
+            background: #7c5cff70;
+        }
+        .dino {
+            width: 40px;
+            height: 40px;
+            background: #7c5cff;
+            position: absolute;
+            bottom: 4px;
+            left: 40px;
+            border-radius: 6px;
+            transition: bottom 0.3s ease;
+        }
+        .dino.jump {
+            bottom: 90px;
+        }
+        /* 细仙人掌 */
+        .cactus {
+            width: 14px;
+            height: 40px;
+            background: #39d078;
+            position: absolute;
+            bottom: 4px;
+            border-radius: 4px;
+        }
+        /* 操作提示文字 轻微浮动 */
+        .game-tip {
+            position: absolute;
+            top: 12px;
+            left: 16px;
+            color: #a2a9bb;
+            font-size: 14px;
+            animation: floatSimple 2.5s ease-in-out infinite;
+        }
+        /* 分数文字 微光脉冲动画 */
+        .game-score {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            color: #cbd5e1;
+            font-size: 15px;
+            animation: scoreShine 1.8s ease-in-out infinite;
+        }
+        /* 游戏结束文字 红色闪烁浮动 */
+        .game-over-txt {
+            position: absolute;
+            width: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 22px;
+            display: none;
+            animation: floatAnim 2s ease-in-out infinite, redBlink 1.2s ease-in-out infinite;
+        }
+        /* 初始活动提示文字：上下浮动+紫流光渐变 */
+        .game-welcome-text {
+            position: absolute;
+            width: 100%;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            animation: floatAnim 2.2s ease-in-out infinite, colorFlow 3s linear infinite;
+        }
+        /* 消失酷炫动画类 */
+        .welcome-hide-anim {
+            opacity: 0;
+            transform: translateY(-50%) scale(2.2) rotate(8deg);
+            filter: blur(6px);
+        }
+        /* 倒计时文字 脉冲放大 */
+        .countdown-text {
+            position: absolute;
+            width: 100%;
+            top: 40%;
+            font-size: 48px;
+            color: #fff;
+            font-weight: bold;
+            display: none;
+            pointer-events: none;
+            animation: countPulse 1s ease-in-out infinite;
+        }
+        /* 游戏控制按钮 向下调整间距 */
+        .game-btn-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin: 60px auto 30px;
+        }
+        .game-btn {
+            padding: 8px 22px;
+            border-radius: 6px;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        .start-btn {
+            background: #7c5cff;
+            color: #fff;
+        }
+        .pause-btn {
+            background: #2a303f;
+            color: #cbd5e1;
+        }
+        .exit-btn {
+            background: #b94c4c;
+            color: #fff;
+        }
         /* 导航卡片容器 */
         .nav-card-wrap {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
-            margin-bottom: 80px;
+            margin-bottom: 0;
         }
         .nav-card {
             background: linear-gradient(145deg, #161b26, #0f131a);
@@ -81,7 +244,7 @@
             background: #9b7fff;
         }
         footer {
-            margin-top: 100px;
+            margin-top: 0;
             padding-top: 30px;
             border-top: 1px solid #252a35;
             color: #5c6372;
@@ -121,7 +284,6 @@
             border-radius: 8px;
             color: #fff;
             font-size: 16px;
-            margin-bottom: 16px;
             outline: none;
         }
         .pwd-input:focus {
@@ -165,6 +327,18 @@
             .nav-card-wrap {
                 grid-template-columns: 1fr;
             }
+            .dino-game-box {
+                height: 140px;
+                margin: 0 auto 40px;
+            }
+            .game-btn-group {
+                margin: 40px auto 25px;
+                flex-wrap: wrap;
+            }
+            .game-welcome-text {
+                font-size: 16px;
+                padding: 0 10px;
+            }
         }
     </style>
 </head>
@@ -181,7 +355,6 @@
             </div>
         </div>
     </div>
-
     <div class="container">
         <div class="header-title">
             <h1>幻方游戏工作室</h1>
@@ -198,7 +371,6 @@
                 </div>
                 <a href="index1.html" class="jump-btn">进入活动站点</a>
             </div>
-
             <!-- 卡片2：皮肤定制定价页 -->
             <div class="nav-card">
                 <h2>皮肤定制定价一览</h2>
@@ -207,7 +379,6 @@
                 </div>
                 <a href="index2.html" class="jump-btn">查看皮肤价格</a>
             </div>
-
             <!-- 卡片3：防伪报价系统（带密码验证） -->
             <div class="nav-card">
                 <h2>防伪报价系统</h2>
@@ -219,24 +390,39 @@
             </div>
         </div>
 
+        <!-- 游戏控制按钮（新增退出按钮） -->
+        <div class="game-btn-group">
+            <button class="game-btn start-btn" id="startBtn">开始游戏</button>
+            <button class="game-btn pause-btn" id="pauseBtn">暂停游戏</button>
+            <button class="game-btn exit-btn" id="exitBtn">退出游戏</button>
+        </div>
+        <!-- 导航卡片下方游戏区域 -->
+        <div class="dino-game-box" id="gameBox">
+            <div class="game-tip">点击游戏框 / 空格跳跃躲避仙人掌</div>
+            <div class="game-score">分数：<span id="scoreNum">0</span></div>
+            <div class="game-over-txt" id="gameOverText">游戏结束，点击重新开始</div>
+            <!-- 活动提示文字 -->
+            <div class="game-welcome-text" id="welcomeText">躲避障碍游戏，躲避25个截图可免单！</div>
+            <div class="countdown-text" id="countText"></div>
+            <div class="dino-ground"></div>
+            <div class="dino" id="dino"></div>
+        </div>
+
         <footer>
             <p>© 2026 幻方游戏工作室 总站 | HuanFang | MSS | 版权保护©</p>
         </footer>
     </div>
-
 <script>
     // 密码配置
     const PASSWORD = "3661330376";
     // 报价页面路径，按需修改
     const QUOTE_URL = "index3.html";
-
     const mask = document.getElementById('pwdMask');
     const openBtn = document.getElementById('openPwdBtn');
     const closeBtn = document.getElementById('pwdClose');
     const confirmBtn = document.getElementById('pwdConfirm');
     const pwdInput = document.getElementById('pwdInput');
     const tipText = document.getElementById('pwdTip');
-
     // 打开密码弹窗
     openBtn.addEventListener('click', () => {
         mask.classList.add('show');
@@ -272,6 +458,234 @@
     pwdInput.addEventListener('keydown', (e) => {
         if(e.key === "Enter") checkPassword();
     })
+
+    // ====================== 恐龙小游戏JS逻辑 ======================
+    const gameBox = document.getElementById('gameBox');
+    const dino = document.getElementById('dino');
+    const scoreNum = document.getElementById('scoreNum');
+    const gameOverText = document.getElementById('gameOverText');
+    const startBtn = document.getElementById('startBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const exitBtn = document.getElementById('exitBtn');
+    const countText = document.getElementById('countText');
+    const welcomeText = document.getElementById('welcomeText');
+
+    let score = 0;
+    let gameRunning = false;
+    let isPaused = false;
+    let isCountdown = false;
+    let cactusList = [];
+    let cactusSpeed = 4;
+    let createCactusTimer = null;
+    let gameLoopTimer = null;
+    let baseSpawnInterval = 1200;
+    const minSafeGap = 700; // 最小安全生成间隔，保证能跳过去
+    let welcomeHidden = false; // 标记活动文字是否已播放消失动画
+
+    // 恐龙跳跃
+    function dinoJump() {
+        if (!gameRunning || isPaused || isCountdown) return;
+        if (dino.classList.contains('jump')) return;
+        dino.classList.add('jump');
+        setTimeout(() => {
+            dino.classList.remove('jump');
+        }, 300);
+    }
+
+    // 获取随机安全生成间隔（700~1400ms）
+    function getRandomSpawnTime() {
+        return minSafeGap + Math.floor(Math.random() * 700);
+    }
+
+    // 生成仙人掌
+    function createCactus() {
+        if (!gameRunning || isPaused || isCountdown) return;
+        const cactus = document.createElement('div');
+        cactus.className = 'cactus';
+        gameBox.appendChild(cactus);
+        cactus.style.left = gameBox.offsetWidth + 'px';
+        cactusList.push(cactus);
+        // 下一次随机安全间隔
+        clearInterval(createCactusTimer);
+        createCactusTimer = setInterval(createCactus, getRandomSpawnTime());
+    }
+
+    // 碰撞检测
+    function checkCollision() {
+        const dinoRect = dino.getBoundingClientRect();
+        const boxRect = gameBox.getBoundingClientRect();
+        const dinoAbs = {
+            left: dinoRect.left - boxRect.left,
+            right: dinoRect.right - boxRect.left,
+            top: dinoRect.top - boxRect.top,
+            bottom: dinoRect.bottom - boxRect.top
+        };
+        for (let c of cactusList) {
+            const cRect = c.getBoundingClientRect();
+            const cAbs = {
+                left: cRect.left - boxRect.left,
+                right: cRect.right - boxRect.left,
+                top: cRect.top - boxRect.top,
+                bottom: cRect.bottom - boxRect.top
+            };
+            if (!(dinoAbs.right < cAbs.left || dinoAbs.left > cAbs.right || dinoAbs.bottom < cAbs.top || dinoAbs.top > cAbs.bottom)) {
+                gameOver();
+                return;
+            }
+        }
+    }
+
+    // 游戏主循环
+    function gameLoop() {
+        if (!gameRunning || isPaused || isCountdown) return;
+        // 移动仙人掌
+        cactusList.forEach((cactus, idx) => {
+            let left = parseFloat(cactus.style.left);
+            left -= cactusSpeed;
+            cactus.style.left = left + 'px';
+            // 移出屏幕删除并加分
+            if (left < -30) {
+                cactus.remove();
+                cactusList.splice(idx, 1);
+                score += 1;
+                scoreNum.innerText = score;
+                // 随分数提速
+                if (score % 10 === 0) cactusSpeed += 0.3;
+            }
+        });
+        checkCollision();
+        gameLoopTimer = requestAnimationFrame(gameLoop);
+    }
+
+    // 游戏结束
+    function gameOver() {
+        gameRunning = false;
+        isPaused = false;
+        cancelAnimationFrame(gameLoopTimer);
+        clearInterval(createCactusTimer);
+        gameOverText.style.display = 'block';
+    }
+
+    // 重新开始游戏
+    function restartGame() {
+        // 清空仙人掌
+        cactusList.forEach(c => c.remove());
+        cactusList = [];
+        score = 0;
+        cactusSpeed = 4;
+        scoreNum.innerText = score;
+        gameOverText.style.display = 'none';
+        gameRunning = true;
+        isPaused = false;
+        startGameLoop();
+    }
+
+    // 退出游戏 完整重置
+    function exitGame() {
+        // 停止所有游戏进程
+        gameRunning = false;
+        isPaused = false;
+        isCountdown = false;
+        cancelAnimationFrame(gameLoopTimer);
+        clearInterval(createCactusTimer);
+        // 清空仙人掌
+        cactusList.forEach(c => c.remove());
+        cactusList = [];
+        // 重置分数
+        score = 0;
+        cactusSpeed = 4;
+        scoreNum.innerText = score;
+        // 隐藏结束/倒计时文字
+        gameOverText.style.display = 'none';
+        countText.style.display = 'none';
+        // 恢复开场提示文字
+        welcomeText.style.display = 'block';
+        welcomeText.classList.remove('welcome-hide-anim');
+        welcomeHidden = false;
+    }
+
+    // 启动生成与循环
+    function startGameLoop() {
+        clearInterval(createCactusTimer);
+        createCactusTimer = setInterval(createCactus, getRandomSpawnTime());
+        gameLoop();
+    }
+
+    // 5秒倒计时后恢复游戏
+    function startCountdown() {
+        isCountdown = true;
+        let count = 5;
+        countText.style.display = 'block';
+        countText.innerText = count;
+        const countTimer = setInterval(() => {
+            count--;
+            if (count <= 0) {
+                clearInterval(countTimer);
+                countText.style.display = 'none';
+                isCountdown = false;
+                isPaused = false;
+                startGameLoop();
+                return;
+            }
+            countText.innerText = count;
+        }, 1000);
+    }
+
+    // 播放文字消失酷炫动画
+    function playWelcomeAnim(callback) {
+        welcomeText.classList.add('welcome-hide-anim');
+        setTimeout(() => {
+            welcomeText.style.display = 'none';
+            welcomeHidden = true;
+            callback();
+        }, 600);
+    }
+
+    // 开始游戏按钮
+    startBtn.addEventListener('click', () => {
+        if(gameRunning && !isPaused) return;
+        if(gameOverText.style.display === 'block'){
+            restartGame();
+            return;
+        }
+        if(isPaused){
+            // 暂停状态恢复，走5秒倒计时（无需再播放开场动画）
+            cancelAnimationFrame(gameLoopTimer);
+            clearInterval(createCactusTimer);
+            startCountdown();
+            return;
+        }
+        // 首次启动，先播放消失动画再开游戏
+        if(!welcomeHidden){
+            playWelcomeAnim(() => {
+                gameRunning = true;
+                startGameLoop();
+            });
+        }else{
+            gameRunning = true;
+            startGameLoop();
+        }
+    });
+
+    // 暂停游戏按钮
+    pauseBtn.addEventListener('click', () => {
+        if(!gameRunning || isPaused || isCountdown) return;
+        isPaused = true;
+        cancelAnimationFrame(gameLoopTimer);
+        clearInterval(createCactusTimer);
+    });
+
+    // 退出游戏按钮
+    exitBtn.addEventListener('click', exitGame);
+
+    // 交互绑定
+    gameBox.addEventListener('click', dinoJump);
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') {
+            e.preventDefault();
+            dinoJump();
+        }
+    });
 </script>
 </body>
 </html>
