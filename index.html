@@ -48,7 +48,6 @@
             border-radius: 14px;
             padding: 36px 24px;
             transition: all 0.3s ease;
-            cursor: pointer;
         }
         .nav-card:hover {
             transform: translateY(-8px);
@@ -75,6 +74,8 @@
             border-radius: 8px;
             font-size: 16px;
             transition: background 0.3s;
+            border: none;
+            cursor: pointer;
         }
         .jump-btn:hover {
             background: #9b7fff;
@@ -85,6 +86,76 @@
             border-top: 1px solid #252a35;
             color: #5c6372;
             font-size: 14px;
+        }
+        /* 密码弹窗样式 */
+        .pwd-mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .pwd-mask.show {
+            display: flex;
+        }
+        .pwd-box {
+            width: 100%;
+            max-width: 340px;
+            background: #161b26;
+            border: 1px solid #7c5cff50;
+            border-radius: 12px;
+            padding: 30px 24px;
+        }
+        .pwd-box h3 {
+            color: #b3a0ff;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+        .pwd-input {
+            width: 100%;
+            padding: 12px 14px;
+            background: #0f131a;
+            border: 1px solid #2a303f;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            margin-bottom: 16px;
+            outline: none;
+        }
+        .pwd-input:focus {
+            border-color: #7c5cff;
+        }
+        .pwd-tip {
+            font-size: 13px;
+            color: #ff9b9b;
+            margin-bottom: 18px;
+            min-height:18px;
+        }
+        .pwd-btn-group {
+            display: flex;
+            gap:12px;
+        }
+        .pwd-confirm {
+            flex:1;
+            padding:11px;
+            background:#7c5cff;
+            color:#fff;
+            border:none;
+            border-radius:8px;
+            font-size:15px;
+            cursor:pointer;
+        }
+        .pwd-close {
+            flex:1;
+            padding:11px;
+            background:#2a303f;
+            color:#cbd5e1;
+            border:none;
+            border-radius:8px;
+            font-size:15px;
+            cursor:pointer;
         }
         /* 移动端适配 */
         @media (max-width: 640px) {
@@ -98,6 +169,19 @@
     </style>
 </head>
 <body>
+    <!-- 密码弹窗遮罩 -->
+    <div class="pwd-mask" id="pwdMask">
+        <div class="pwd-box">
+            <h3>访问报价工具验证</h3>
+            <input class="pwd-input" id="pwdInput" type="password" placeholder="请输入访问密码">
+            <div class="pwd-tip" id="pwdTip"></div>
+            <div class="pwd-btn-group">
+                <button class="pwd-confirm" id="pwdConfirm">确认进入</button>
+                <button class="pwd-close" id="pwdClose">取消</button>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <div class="header-title">
             <h1>幻方游戏工作室</h1>
@@ -124,13 +208,14 @@
                 <a href="index2.html" class="jump-btn">查看皮肤价格</a>
             </div>
 
-            <!-- 卡片3：防伪报价系统 -->
+            <!-- 卡片3：防伪报价系统（带密码验证） -->
             <div class="nav-card">
                 <h2>防伪报价系统</h2>
                 <div class="desc">
                     自动生成带MD5校验指纹的正式报价单，支持折扣计算、产品明细增删、防篡改校验，适配微信/QQ一键复制报价。
+                    <br><span style="color:#ff9b9b">内部专用工具，需密码验证后访问</span>
                 </div>
-                <a href="index3.html" class="jump-btn">打开报价工具</a>
+                <button class="jump-btn" id="openPwdBtn">打开报价工具</button>
             </div>
         </div>
 
@@ -138,5 +223,55 @@
             <p>© 2026 幻方游戏工作室 总站 | 所有业务页面独立互不干扰，原页面内容无任何修改</p>
         </footer>
     </div>
+
+<script>
+    // 密码配置
+    const PASSWORD = "3661330376";
+    // 报价页面路径，按需修改
+    const QUOTE_URL = "index3.html";
+
+    const mask = document.getElementById('pwdMask');
+    const openBtn = document.getElementById('openPwdBtn');
+    const closeBtn = document.getElementById('pwdClose');
+    const confirmBtn = document.getElementById('pwdConfirm');
+    const pwdInput = document.getElementById('pwdInput');
+    const tipText = document.getElementById('pwdTip');
+
+    // 打开密码弹窗
+    openBtn.addEventListener('click', () => {
+        mask.classList.add('show');
+        pwdInput.value = '';
+        tipText.innerText = '';
+        pwdInput.focus();
+    });
+    // 关闭弹窗
+    closeBtn.addEventListener('click', () => {
+        mask.classList.remove('show');
+    });
+    // 点击遮罩空白处关闭
+    mask.addEventListener('click', (e) => {
+        if(e.target === mask) mask.classList.remove('show');
+    });
+    // 确认密码
+    function checkPassword(){
+        const inputVal = pwdInput.value.trim();
+        if(inputVal === ""){
+            tipText.innerText = "请输入密码！";
+            return;
+        }
+        if(inputVal !== PASSWORD){
+            tipText.innerText = "密码错误，请重新输入";
+            pwdInput.value = "";
+            return;
+        }
+        // 密码正确跳转
+        window.location.href = QUOTE_URL;
+    }
+    confirmBtn.addEventListener('click', checkPassword);
+    // 回车快速确认
+    pwdInput.addEventListener('keydown', (e) => {
+        if(e.key === "Enter") checkPassword();
+    })
+</script>
 </body>
 </html>
