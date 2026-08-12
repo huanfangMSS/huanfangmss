@@ -35,6 +35,43 @@
             color: #8a91a0;
             font-size: 16px;
         }
+
+        /* ========== 新增顶部福利闪烁横幅样式 ========== */
+        .notice-banner {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            padding: 14px 20px;
+            border-radius: 10px;
+            border: 1px solid #7c5cff60;
+            background: rgba(124, 92, 255, 0.08);
+        }
+        .notice-text {
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            /* 组合多动画：流光变色 + 呼吸透明度闪烁 + 轻微上下浮动 */
+            animation: bannerColorFlow 2s linear infinite, bannerBlink 1.5s ease-in-out infinite, bannerFloat 2.2s ease-in-out infinite;
+        }
+        /* 文字流光渐变 */
+        @keyframes bannerColorFlow {
+            0% { color: #b3a0ff; text-shadow: 0 0 8px #7c5cff; }
+            50% { color: #ffffff; text-shadow: 0 0 16px #7c5cff; }
+            100% { color: #b3a0ff; text-shadow: 0 0 8px #7c5cff; }
+        }
+        /* 呼吸闪烁透明度 */
+        @keyframes bannerBlink {
+            0% { opacity: 0.75; }
+            50% { opacity: 1; }
+            100% { opacity: 0.75; }
+        }
+        /* 轻微上下浮动 */
+        @keyframes bannerFloat {
+            0% { transform: translateY(-3px); }
+            50% { transform: translateY(3px); }
+            100% { transform: translateY(-3px); }
+        }
+
         /* ========== 动画关键帧 ========== */
         /* 上下浮动呼吸 */
         @keyframes floatAnim {
@@ -324,6 +361,9 @@
             .header-title h1 {
                 font-size: 28px;
             }
+            .notice-text {
+                font-size: 16px;
+            }
             .nav-card-wrap {
                 grid-template-columns: 1fr;
             }
@@ -361,6 +401,11 @@
             <p>MC皮肤定制 | 线上活动 | 防伪报价 统一入口总站</p>
         </div>
 
+        <!-- 新增闪烁福利提示横幅（卡片上方） -->
+        <div class="notice-banner">
+            <div class="notice-text">下滑至页面底部有免单福利！</div>
+        </div>
+
         <div class="nav-card-wrap">
             <!-- 卡片1：线上活动官网 -->
             <div class="nav-card">
@@ -389,7 +434,6 @@
                 <button class="jump-btn" id="openPwdBtn">打开报价工具</button>
             </div>
         </div>
-
         <!-- 游戏控制按钮（新增退出按钮） -->
         <div class="game-btn-group">
             <button class="game-btn start-btn" id="startBtn">开始游戏</button>
@@ -398,16 +442,15 @@
         </div>
         <!-- 导航卡片下方游戏区域 -->
         <div class="dino-game-box" id="gameBox">
-            <div class="game-tip">点击游戏框 / 空格跳跃躲避仙人掌</div>
+            <div class="game-tip">点击游戏框 / 空格跳跃躲避障碍物</div>
             <div class="game-score">分数：<span id="scoreNum">0</span></div>
             <div class="game-over-txt" id="gameOverText">游戏结束，点击重新开始</div>
             <!-- 活动提示文字 -->
-            <div class="game-welcome-text" id="welcomeText">躲避障碍游戏，躲避25个截图可免单！</div>
+            <div class="game-welcome-text" id="welcomeText">躲避障碍游戏，躲避35个截图可免单！</div>
             <div class="countdown-text" id="countText"></div>
             <div class="dino-ground"></div>
             <div class="dino" id="dino"></div>
         </div>
-
         <footer>
             <p>© 2026 幻方游戏工作室 总站 | HuanFang | MSS | 版权保护©</p>
     </div>
@@ -457,7 +500,6 @@
     pwdInput.addEventListener('keydown', (e) => {
         if(e.key === "Enter") checkPassword();
     })
-
     // ====================== 恐龙小游戏JS逻辑 ======================
     const gameBox = document.getElementById('gameBox');
     const dino = document.getElementById('dino');
@@ -468,7 +510,6 @@
     const exitBtn = document.getElementById('exitBtn');
     const countText = document.getElementById('countText');
     const welcomeText = document.getElementById('welcomeText');
-
     let score = 0;
     let gameRunning = false;
     let isPaused = false;
@@ -480,11 +521,10 @@
     let baseSpawnInterval = 1200;
     // 难度参数：保证高分容错
     const minSafeGap = 600;   // 最小安全间隔（不会挤死）
-    const maxSpeed = 8;       // 速度上限，不会无限加速
-    const speedStep = 0.3;    // 每10分提速幅度
+    const maxSpeed = 15;       // 速度上限，不会无限加速
+    const speedStep = 0.5;    // 每10分提速幅度
     const spawnCutStep = 80;  // 每10分缩短生成间隔
     let welcomeHidden = false; // 标记活动文字是否已播放消失动画
-
     // 恐龙跳跃
     function dinoJump() {
         if (!gameRunning || isPaused || isCountdown) return;
@@ -494,7 +534,6 @@
             dino.classList.remove('jump');
         }, 300);
     }
-
     // 根据当前分数计算当前生成间隔（每10分缩小间隔，有下限）
     function getCurrentSpawnInterval() {
         const level = Math.floor(score / 10);
@@ -502,14 +541,12 @@
         const val = baseSpawnInterval - reduce;
         return Math.max(minSafeGap, val);
     }
-
     // 获取随机安全生成间隔（区间随分数收紧，但保底600ms）
     function getRandomSpawnTime() {
         const currBase = getCurrentSpawnInterval();
         const randomRange = 600;
         return currBase + Math.floor(Math.random() * randomRange);
     }
-
     // 生成仙人掌
     function createCactus() {
         if (!gameRunning || isPaused || isCountdown) return;
@@ -522,7 +559,6 @@
         clearInterval(createCactusTimer);
         createCactusTimer = setInterval(createCactus, getRandomSpawnTime());
     }
-
     // 碰撞检测
     function checkCollision() {
         const dinoRect = dino.getBoundingClientRect();
@@ -547,7 +583,6 @@
             }
         }
     }
-
     // 游戏主循环
     function gameLoop() {
         if (!gameRunning || isPaused || isCountdown) return;
@@ -574,7 +609,6 @@
         checkCollision();
         gameLoopTimer = requestAnimationFrame(gameLoop);
     }
-
     // 游戏结束
     function gameOver() {
         gameRunning = false;
@@ -583,7 +617,6 @@
         clearInterval(createCactusTimer);
         gameOverText.style.display = 'block';
     }
-
     // 重新开始游戏
     function restartGame() {
         // 清空仙人掌
@@ -597,7 +630,6 @@
         isPaused = false;
         startGameLoop();
     }
-
     // 退出游戏 完整重置
     function exitGame() {
         // 停止所有游戏进程
@@ -621,14 +653,12 @@
         welcomeText.classList.remove('welcome-hide-anim');
         welcomeHidden = false;
     }
-
     // 启动生成与循环
     function startGameLoop() {
         clearInterval(createCactusTimer);
         createCactusTimer = setInterval(createCactus, getRandomSpawnTime());
         gameLoop();
     }
-
     // 5秒倒计时后恢复游戏
     function startCountdown() {
         isCountdown = true;
@@ -648,7 +678,6 @@
             countText.innerText = count;
         }, 1000);
     }
-
     // 播放文字消失酷炫动画
     function playWelcomeAnim(callback) {
         welcomeText.classList.add('welcome-hide-anim');
@@ -658,7 +687,6 @@
             callback();
         }, 600);
     }
-
     // 开始游戏按钮
     startBtn.addEventListener('click', () => {
         if(gameRunning && !isPaused) return;
@@ -684,7 +712,6 @@
             startGameLoop();
         }
     });
-
     // 暂停游戏按钮
     pauseBtn.addEventListener('click', () => {
         if(!gameRunning || isPaused || isCountdown) return;
@@ -692,10 +719,8 @@
         cancelAnimationFrame(gameLoopTimer);
         clearInterval(createCactusTimer);
     });
-
     // 退出游戏按钮
     exitBtn.addEventListener('click', exitGame);
-
     // 交互绑定
     gameBox.addEventListener('click', dinoJump);
     document.addEventListener('keydown', (e) => {
