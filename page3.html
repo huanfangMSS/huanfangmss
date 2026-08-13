@@ -326,6 +326,71 @@
             text-align: right;
             color: #8a91a0;
         }
+        /* ========== 统一美化：平滑滚动+滚动条 ========== */
+        html { scroll-behavior: smooth; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0c0e14; }
+        ::-webkit-scrollbar-thumb { background: #7c5cff50; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #7c5cff80; }
+        /* ========== 统一美化：背景动态光晕 ========== */
+        body::before {
+            content: ""; position: fixed; top: -20%; left: -10%;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(124,92,255,0.08) 0%, transparent 70%);
+            border-radius: 50%; pointer-events: none; z-index: 0;
+            animation: bgGlow1 12s ease-in-out infinite;
+        }
+        body::after {
+            content: ""; position: fixed; bottom: -15%; right: -10%;
+            width: 450px; height: 450px;
+            background: radial-gradient(circle, rgba(124,92,255,0.06) 0%, transparent 70%);
+            border-radius: 50%; pointer-events: none; z-index: 0;
+            animation: bgGlow2 15s ease-in-out infinite;
+        }
+        @keyframes bgGlow1 { 0%,100%{transform:translate(0,0);opacity:.6} 50%{transform:translate(60px,40px);opacity:1} }
+        @keyframes bgGlow2 { 0%,100%{transform:translate(0,0);opacity:.5} 50%{transform:translate(-50px,-30px);opacity:.9} }
+        .container { position: relative; z-index: 1; }
+        /* ========== 统一美化：标题发光呼吸 ========== */
+        .page-header h1 {
+            text-shadow: 0 0 20px rgba(124,92,255,.4), 0 0 40px rgba(124,92,255,.15);
+            animation: titleGlow 3.5s ease-in-out infinite;
+        }
+        @keyframes titleGlow {
+            0%,100%{text-shadow:0 0 20px rgba(124,92,255,.4),0 0 40px rgba(124,92,255,.15)}
+            50%{text-shadow:0 0 28px rgba(124,92,255,.6),0 0 55px rgba(124,92,255,.25)}
+        }
+        /* ========== 统一美化：按钮点击反馈 ========== */
+        .btn { transition: all 0.3s ease; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(124,92,255,.35); }
+        .btn:active { transform: translateY(0) scale(0.97); }
+        .float-contact-btn:active { transform: scale(0.92); }
+        /* ========== 统一美化：卡片悬浮升级 ========== */
+        .skin-card { position: relative; overflow: hidden; }
+        .skin-card::before {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, #7c5cff, transparent);
+            opacity: 0; transition: opacity 0.35s ease;
+        }
+        .skin-card:hover::before { opacity: 1; }
+        /* ========== 统一美化：背景音乐按钮 ========== */
+        .music-control {
+            position: fixed; top: 20px; right: 20px; width: 46px; height: 46px;
+            border-radius: 50%; background: rgba(124,92,255,.12);
+            border: 1px solid #7c5cff50; color: #b3a0ff; font-size: 20px;
+            cursor: pointer; z-index: 10001; display: flex; align-items: center;
+            justify-content: center; transition: all 0.3s ease; backdrop-filter: blur(8px);
+            user-select: none; box-shadow: 0 2px 12px rgba(124,92,255,.15);
+        }
+        .music-control:hover { background: rgba(124,92,255,.28); border-color: #7c5cff; transform: scale(1.12); box-shadow: 0 4px 18px rgba(124,92,255,.3); }
+        .music-control:active { transform: scale(0.95); }
+        .music-control.playing { animation: musicSpin 4s linear infinite; }
+        @keyframes musicSpin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+        .music-control.playing:hover { animation-play-state: paused; transform: scale(1.12); }
+        .music-control:not(.playing) { animation: musicBreath 2.5s ease-in-out infinite; }
+        @keyframes musicBreath { 0%,100%{box-shadow:0 2px 12px rgba(124,92,255,.15)} 50%{box-shadow:0 2px 22px rgba(124,92,255,.5)} }
+        @media (max-width: 600px) {
+            .music-control { top: 14px; right: 14px; width: 40px; height: 40px; font-size: 18px; }
+        }
     </style>
     <style>
         img{
@@ -335,6 +400,11 @@
     </style>
 </head>
 <body>
+    <!-- 背景音乐 -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="bgm.mp3" type="audio/mpeg">
+    </audio>
+    <button class="music-control" id="musicBtn" title="背景音乐开关">♪</button>
     <!-- 粒子画布 -->
     <canvas id="particleCanvas"></canvas>
     <!-- 悬浮联系按钮 -->
@@ -508,6 +578,35 @@
         </footer>
     </div>
     <script>
+        // ====================== 背景音乐 ======================
+        const MUSIC_URL = "城南花已开.mp3";
+        const MUSIC_VOLUME = 0.5;
+        const bgMusic = document.getElementById('bgMusic');
+        const musicBtn = document.getElementById('musicBtn');
+        bgMusic.src = MUSIC_URL;
+        bgMusic.volume = MUSIC_VOLUME;
+        let musicPlaying = false;
+        function updateMusicBtn() {
+            if (musicPlaying) { musicBtn.classList.add('playing'); musicBtn.innerText = '♫'; musicBtn.title = '点击暂停背景音乐'; }
+            else { musicBtn.classList.remove('playing'); musicBtn.innerText = '♪'; musicBtn.title = '点击播放背景音乐'; }
+        }
+        function playMusic() {
+            bgMusic.play().then(() => { musicPlaying = true; updateMusicBtn(); })
+                .catch(() => { musicPlaying = false; updateMusicBtn(); });
+        }
+        function pauseMusic() { bgMusic.pause(); musicPlaying = false; updateMusicBtn(); }
+        playMusic();
+        function tryPlayOnInteract() {
+            if (!musicPlaying) playMusic();
+            document.removeEventListener('click', tryPlayOnInteract);
+            document.removeEventListener('touchstart', tryPlayOnInteract);
+            document.removeEventListener('keydown', tryPlayOnInteract);
+        }
+        document.addEventListener('click', tryPlayOnInteract);
+        document.addEventListener('touchstart', tryPlayOnInteract);
+        document.addEventListener('keydown', tryPlayOnInteract);
+        musicBtn.addEventListener('click', (e) => { e.stopPropagation(); musicPlaying ? pauseMusic() : playMusic(); });
+
         // ========== 联系弹窗逻辑（DOM全局缓存，减少重复查询） ==========
         const domCache = {
             openBtn: document.getElementById('openContact'),

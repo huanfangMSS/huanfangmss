@@ -95,9 +95,100 @@
             padding: 30px 0;
             margin-top: 60px;
         }
+        /* ========== 统一美化：平滑滚动+滚动条 ========== */
+        html { scroll-behavior: smooth; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #e2e8f0; }
+        ::-webkit-scrollbar-thumb { background: #2563eb60; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #2563eb90; }
+        /* ========== 统一美化：背景动态光晕 ========== */
+        body::before {
+            content: ""; position: fixed; top: -20%; left: -10%;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(37,99,235,0.07) 0%, transparent 70%);
+            border-radius: 50%; pointer-events: none; z-index: 0;
+            animation: bgGlow1 12s ease-in-out infinite;
+        }
+        body::after {
+            content: ""; position: fixed; bottom: -15%; right: -10%;
+            width: 450px; height: 450px;
+            background: radial-gradient(circle, rgba(37,99,235,0.05) 0%, transparent 70%);
+            border-radius: 50%; pointer-events: none; z-index: 0;
+            animation: bgGlow2 15s ease-in-out infinite;
+        }
+        @keyframes bgGlow1 { 0%,100%{transform:translate(0,0);opacity:.6} 50%{transform:translate(60px,40px);opacity:1} }
+        @keyframes bgGlow2 { 0%,100%{transform:translate(0,0);opacity:.5} 50%{transform:translate(-50px,-30px);opacity:.9} }
+        .container { position: relative; z-index: 1; }
+        header { position: relative; z-index: 2; }
+        footer { position: relative; z-index: 1; }
+        /* ========== 统一美化：标题发光呼吸 ========== */
+        h2 {
+            text-shadow: 0 0 18px rgba(37,99,235,0.15);
+            animation: titleGlow 3.5s ease-in-out infinite;
+        }
+        @keyframes titleGlow {
+            0%,100%{text-shadow:0 0 18px rgba(37,99,235,0.15)}
+            50%{text-shadow:0 0 26px rgba(37,99,235,0.3)}
+        }
+        /* ========== 统一美化：按钮点击反馈 ========== */
+        .btn { transition: all 0.3s ease; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(37,99,235,0.35); }
+        .btn:active { transform: translateY(0) scale(0.97); }
+        /* ========== 统一美化：卡片悬浮升级 ========== */
+        .card { position: relative; overflow: hidden; transition: all 0.35s cubic-bezier(0.4,0,0.2,1); }
+        .card::before {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, #2563eb, transparent);
+            opacity: 0; transition: opacity 0.35s ease;
+        }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(37,99,235,0.12); }
+        .card:hover::before { opacity: 1; }
+        /* ========== 统一美化：点击波纹+粒子特效 ========== */
+        .click-ripple {
+            position: fixed; border-radius: 50%;
+            border: 2px solid rgba(37,99,235,0.6);
+            pointer-events: none; z-index: 9997;
+            transform: translate(-50%, -50%) scale(0);
+            animation: clickRippleAnim 0.65s ease-out forwards;
+        }
+        @keyframes clickRippleAnim {
+            0%{transform:translate(-50%,-50%) scale(0);opacity:1}
+            100%{transform:translate(-50%,-50%) scale(3);opacity:0}
+        }
+        .click-particle {
+            position: fixed; width: 6px; height: 6px; border-radius: 50%;
+            background: radial-gradient(circle, #60a5fa, #2563eb);
+            pointer-events: none; z-index: 9997;
+            box-shadow: 0 0 8px rgba(37,99,235,0.7);
+        }
+        /* ========== 统一美化：背景音乐按钮 ========== */
+        .music-control {
+            position: fixed; top: 20px; right: 20px; width: 46px; height: 46px;
+            border-radius: 50%; background: rgba(255,255,255,0.85);
+            border: 1px solid #2563eb40; color: #2563eb; font-size: 20px;
+            cursor: pointer; z-index: 10001; display: flex; align-items: center;
+            justify-content: center; transition: all 0.3s ease; backdrop-filter: blur(8px);
+            user-select: none; box-shadow: 0 2px 12px rgba(37,99,235,0.15);
+        }
+        .music-control:hover { background: #2563eb; color: #fff; border-color: #2563eb; transform: scale(1.12); box-shadow: 0 4px 18px rgba(37,99,235,0.3); }
+        .music-control:active { transform: scale(0.95); }
+        .music-control.playing { animation: musicSpin 4s linear infinite; }
+        @keyframes musicSpin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+        .music-control.playing:hover { animation-play-state: paused; transform: scale(1.12); }
+        .music-control:not(.playing) { animation: musicBreath 2.5s ease-in-out infinite; }
+        @keyframes musicBreath { 0%,100%{box-shadow:0 2px 12px rgba(37,99,235,.15)} 50%{box-shadow:0 2px 22px rgba(37,99,235,.45)} }
+        /* 移动端适配 */
+        @media (max-width: 640px) {
+            .music-control { top: 14px; right: 14px; width: 40px; height: 40px; font-size: 18px; }
+        }
     </style>
 </head>
 <body>
+    <!-- 背景音乐 -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="bgm.mp3" type="audio/mpeg">
+    </audio>
+    <button class="music-control" id="musicBtn" title="背景音乐开关">♪</button>
     <header>
         <div class="nav-wrap">
             <a href="index.html" class="logo">幻方活动站</a>
@@ -131,5 +222,76 @@
     <footer>
         <p>© 2026 幻方游戏工作室线上活动专题页</p>
     </footer>
+    <script>
+        // ====================== 背景音乐 ======================
+        const MUSIC_URL = "城南花已开.mp3";
+        const MUSIC_VOLUME = 0.5;
+        const bgMusic = document.getElementById('bgMusic');
+        const musicBtn = document.getElementById('musicBtn');
+        bgMusic.src = MUSIC_URL;
+        bgMusic.volume = MUSIC_VOLUME;
+        let musicPlaying = false;
+        function updateMusicBtn() {
+            if (musicPlaying) { musicBtn.classList.add('playing'); musicBtn.innerText = '♫'; musicBtn.title = '点击暂停背景音乐'; }
+            else { musicBtn.classList.remove('playing'); musicBtn.innerText = '♪'; musicBtn.title = '点击播放背景音乐'; }
+        }
+        function playMusic() {
+            bgMusic.play().then(() => { musicPlaying = true; updateMusicBtn(); })
+                .catch(() => { musicPlaying = false; updateMusicBtn(); });
+        }
+        function pauseMusic() { bgMusic.pause(); musicPlaying = false; updateMusicBtn(); }
+        playMusic();
+        function tryPlayOnInteract() {
+            if (!musicPlaying) playMusic();
+            document.removeEventListener('click', tryPlayOnInteract);
+            document.removeEventListener('touchstart', tryPlayOnInteract);
+            document.removeEventListener('keydown', tryPlayOnInteract);
+        }
+        document.addEventListener('click', tryPlayOnInteract);
+        document.addEventListener('touchstart', tryPlayOnInteract);
+        document.addEventListener('keydown', tryPlayOnInteract);
+        musicBtn.addEventListener('click', (e) => { e.stopPropagation(); musicPlaying ? pauseMusic() : playMusic(); });
+
+        // ====================== 点击波纹+粒子特效 ======================
+        function createClickEffect(x, y) {
+            // —— 波纹扩散 ——
+            const ripple = document.createElement('div');
+            ripple.className = 'click-ripple';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.style.width = '40px';
+            ripple.style.height = '40px';
+            document.body.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 650);
+            // —— 粒子四散 ——
+            const particleCount = 5 + Math.floor(Math.random() * 4);
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'click-particle';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                document.body.appendChild(particle);
+                const angle = (Math.PI * 2 / particleCount) * i + (Math.random() - 0.5) * 0.8;
+                const distance = 35 + Math.random() * 45;
+                const dx = Math.cos(angle) * distance;
+                const dy = Math.sin(angle) * distance;
+                const duration = 450 + Math.random() * 250;
+                particle.animate([
+                    { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+                    { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0)`, opacity: 0 }
+                ], { duration: duration, easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)', fill: 'forwards' });
+                setTimeout(() => particle.remove(), duration + 50);
+            }
+        }
+        document.addEventListener('click', (e) => {
+            if (e.target.tagName === 'INPUT') return;
+            createClickEffect(e.clientX, e.clientY);
+        });
+        document.addEventListener('touchstart', (e) => {
+            if (e.target.tagName === 'INPUT') return;
+            const touch = e.touches[0];
+            if (touch) createClickEffect(touch.clientX, touch.clientY);
+        }, { passive: true });
+    </script>
 </body>
 </html>
