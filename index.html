@@ -453,9 +453,52 @@
                 font-size: 22px;
             }
         }
+        /* ========== 背景音乐控制按钮 ========== */
+        .music-control {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(124, 92, 255, 0.15);
+            border: 1px solid #7c5cff60;
+            color: #b3a0ff;
+            font-size: 22px;
+            cursor: pointer;
+            z-index: 9998;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(6px);
+            user-select: none;
+        }
+        .music-control:hover {
+            background: rgba(124, 92, 255, 0.3);
+            border-color: #7c5cff;
+            transform: scale(1.1);
+        }
+        .music-control.playing {
+            animation: musicSpin 4s linear infinite;
+        }
+        @keyframes musicSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .music-control.playing:hover {
+            animation-play-state: paused;
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
+    <!-- 背景音乐（mp3格式，循环播放） -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="bgm.mp3" type="audio/mpeg">
+    </audio>
+    <!-- 背景音乐开关按钮 -->
+    <button class="music-control" id="musicBtn" title="背景音乐开关">♪</button>
     <!-- 密码弹窗遮罩 -->
     <div class="pwd-mask" id="pwdMask">
         <div class="pwd-box">
@@ -557,6 +600,77 @@
         </footer>
     </div>
 <script>
+    // ====================== 背景音乐配置 ======================
+    // 【后期修改音乐】只需修改下面的文件路径，将 mp3 文件放在与本 html 同目录下即可
+    const MUSIC_URL = "城南花已开.mp3";
+    // 音量大小，范围 0.0 ~ 1.0
+    const MUSIC_VOLUME = 0.5;
+
+    const bgMusic = document.getElementById('bgMusic');
+    const musicBtn = document.getElementById('musicBtn');
+    bgMusic.src = MUSIC_URL;
+    bgMusic.volume = MUSIC_VOLUME;
+
+    let musicPlaying = false;
+
+    // 更新按钮显示状态
+    function updateMusicBtn() {
+        if (musicPlaying) {
+            musicBtn.classList.add('playing');
+            musicBtn.innerText = '♫';
+            musicBtn.title = '点击暂停背景音乐';
+        } else {
+            musicBtn.classList.remove('playing');
+            musicBtn.innerText = '♪';
+            musicBtn.title = '点击播放背景音乐';
+        }
+    }
+
+    // 播放音乐
+    function playMusic() {
+        bgMusic.play().then(() => {
+            musicPlaying = true;
+            updateMusicBtn();
+        }).catch(() => {
+            // 浏览器策略阻止自动播放，等待用户首次交互后再播
+            musicPlaying = false;
+            updateMusicBtn();
+        });
+    }
+
+    // 暂停音乐
+    function pauseMusic() {
+        bgMusic.pause();
+        musicPlaying = false;
+        updateMusicBtn();
+    }
+
+    // 页面加载后尝试自动播放
+    playMusic();
+
+    // 若被浏览器阻止，用户首次点击/触摸/按键时自动播放（仅触发一次）
+    function tryPlayOnInteract() {
+        if (!musicPlaying) {
+            playMusic();
+        }
+        document.removeEventListener('click', tryPlayOnInteract);
+        document.removeEventListener('touchstart', tryPlayOnInteract);
+        document.removeEventListener('keydown', tryPlayOnInteract);
+    }
+    document.addEventListener('click', tryPlayOnInteract);
+    document.addEventListener('touchstart', tryPlayOnInteract);
+    document.addEventListener('keydown', tryPlayOnInteract);
+
+    // 按钮点击切换播放/暂停
+    musicBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (musicPlaying) {
+            pauseMusic();
+        } else {
+            playMusic();
+        }
+    });
+
     // ====================== 图片放大预览JS ======================
     const imgMask = document.getElementById('imgPreviewMask');
     const previewImg = document.getElementById('previewImg');
